@@ -21,23 +21,26 @@
 #import "UIView+JSQMessages.h"
 
 const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingDefault = 8.0f;
-
+const CGFloat kJSQMessagesToolbarButtonBottomInset_iPhoneXDefault = 26.0f;
+const CGFloat kJSQMessagesToolbarTextViewBottomInset_iPhoneXDefault = 27.0f;
 
 @interface JSQMessagesToolbarContentView ()
 
 @property (weak, nonatomic) IBOutlet JSQMessagesComposerTextView *textView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *textViewBottomConstraint;
 
 @property (weak, nonatomic) IBOutlet UIView *leftBarButtonContainerView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *leftBarButtonContainerViewWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *leftBarButtonContainerViewBottomConstraint;
 
 @property (weak, nonatomic) IBOutlet UIView *rightBarButtonContainerView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *rightBarButtonContainerViewWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *rightBarButtonContainerViewBottomConstraint;
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *leftHorizontalSpacingConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *rightHorizontalSpacingConstraint;
 
 @end
-
 
 
 @implementation JSQMessagesToolbarContentView
@@ -46,147 +49,154 @@ const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingDefault = 8.0f;
 
 + (UINib *)nib
 {
-    return [UINib nibWithNibName:NSStringFromClass([JSQMessagesToolbarContentView class])
-                          bundle:[NSBundle bundleForClass:[JSQMessagesToolbarContentView class]]];
+	return [UINib nibWithNibName:NSStringFromClass([JSQMessagesToolbarContentView class])
+						  bundle:[NSBundle bundleForClass:[JSQMessagesToolbarContentView class]]];
 }
 
 #pragma mark - Initialization
 
 - (void)awakeFromNib
 {
-    [super awakeFromNib];
+	[super awakeFromNib];
 
-    [self setTranslatesAutoresizingMaskIntoConstraints:NO];
+	[self setTranslatesAutoresizingMaskIntoConstraints:NO];
 
-    self.leftHorizontalSpacingConstraint.constant = kJSQMessagesToolbarContentViewHorizontalSpacingDefault;
-    self.rightHorizontalSpacingConstraint.constant = kJSQMessagesToolbarContentViewHorizontalSpacingDefault;
+	self.leftHorizontalSpacingConstraint.constant = kJSQMessagesToolbarContentViewHorizontalSpacingDefault;
+	self.rightHorizontalSpacingConstraint.constant = kJSQMessagesToolbarContentViewHorizontalSpacingDefault;
 
-    self.backgroundColor = [UIColor clearColor];
+	if (self.shouldAddSpaceForHomeIndicator == YES) {
+		self.leftBarButtonContainerViewBottomConstraint.constant = kJSQMessagesToolbarButtonBottomInset_iPhoneXDefault;
+		self.rightBarButtonContainerViewBottomConstraint.constant = kJSQMessagesToolbarButtonBottomInset_iPhoneXDefault;
+		self.textViewBottomConstraint.constant = kJSQMessagesToolbarTextViewBottomInset_iPhoneXDefault;
+	}
+
+	self.backgroundColor = [UIColor clearColor];
 }
 
 #pragma mark - Setters
 
 - (void)setBackgroundColor:(UIColor *)backgroundColor
 {
-    [super setBackgroundColor:backgroundColor];
-    self.leftBarButtonContainerView.backgroundColor = backgroundColor;
-    self.rightBarButtonContainerView.backgroundColor = backgroundColor;
+	[super setBackgroundColor:backgroundColor];
+	self.leftBarButtonContainerView.backgroundColor = backgroundColor;
+	self.rightBarButtonContainerView.backgroundColor = backgroundColor;
 }
 
 - (void)setLeftBarButtonItem:(UIButton *)leftBarButtonItem
 {
-    if (_leftBarButtonItem) {
-        [_leftBarButtonItem removeFromSuperview];
-    }
+	if (_leftBarButtonItem) {
+		[_leftBarButtonItem removeFromSuperview];
+	}
 
-    if (!leftBarButtonItem) {
-        _leftBarButtonItem = nil;
-        self.leftHorizontalSpacingConstraint.constant = 0.0f;
-        self.leftBarButtonItemWidth = 0.0f;
-        self.leftBarButtonContainerView.hidden = YES;
-        return;
-    }
+	if (!leftBarButtonItem) {
+		_leftBarButtonItem = nil;
+		self.leftHorizontalSpacingConstraint.constant = 0.0f;
+		self.leftBarButtonItemWidth = 0.0f;
+		self.leftBarButtonContainerView.hidden = YES;
+		return;
+	}
 
-    if (CGRectEqualToRect(leftBarButtonItem.frame, CGRectZero)) {
-        leftBarButtonItem.frame = self.leftBarButtonContainerView.bounds;
-    }
+	if (CGRectEqualToRect(leftBarButtonItem.frame, CGRectZero)) {
+		leftBarButtonItem.frame = self.leftBarButtonContainerView.bounds;
+	}
 
-    self.leftBarButtonContainerView.hidden = NO;
-    self.leftHorizontalSpacingConstraint.constant = kJSQMessagesToolbarContentViewHorizontalSpacingDefault;
-    self.leftBarButtonItemWidth = CGRectGetWidth(leftBarButtonItem.frame);
+	self.leftBarButtonContainerView.hidden = NO;
+	self.leftHorizontalSpacingConstraint.constant = kJSQMessagesToolbarContentViewHorizontalSpacingDefault;
+	self.leftBarButtonItemWidth = CGRectGetWidth(leftBarButtonItem.frame);
 
-    [leftBarButtonItem setTranslatesAutoresizingMaskIntoConstraints:NO];
+	[leftBarButtonItem setTranslatesAutoresizingMaskIntoConstraints:NO];
 
-    [self.leftBarButtonContainerView addSubview:leftBarButtonItem];
-    [self.leftBarButtonContainerView jsq_pinAllEdgesOfSubview:leftBarButtonItem];
-    [self setNeedsUpdateConstraints];
+	[self.leftBarButtonContainerView addSubview:leftBarButtonItem];
+	[self.leftBarButtonContainerView jsq_pinAllEdgesOfSubview:leftBarButtonItem];
+	[self setNeedsUpdateConstraints];
 
-    _leftBarButtonItem = leftBarButtonItem;
+	_leftBarButtonItem = leftBarButtonItem;
 }
 
 - (void)setLeftBarButtonItemWidth:(CGFloat)leftBarButtonItemWidth
 {
-    self.leftBarButtonContainerViewWidthConstraint.constant = leftBarButtonItemWidth;
-    [self setNeedsUpdateConstraints];
+	self.leftBarButtonContainerViewWidthConstraint.constant = leftBarButtonItemWidth;
+	[self setNeedsUpdateConstraints];
 }
 
 - (void)setRightBarButtonItem:(UIButton *)rightBarButtonItem
 {
-    if (_rightBarButtonItem) {
-        [_rightBarButtonItem removeFromSuperview];
-    }
+	if (_rightBarButtonItem) {
+		[_rightBarButtonItem removeFromSuperview];
+	}
 
-    if (!rightBarButtonItem) {
-        _rightBarButtonItem = nil;
-        self.rightHorizontalSpacingConstraint.constant = 0.0f;
-        self.rightBarButtonItemWidth = 0.0f;
-        self.rightBarButtonContainerView.hidden = YES;
-        return;
-    }
+	if (!rightBarButtonItem) {
+		_rightBarButtonItem = nil;
+		self.rightHorizontalSpacingConstraint.constant = 0.0f;
+		self.rightBarButtonItemWidth = 0.0f;
+		self.rightBarButtonContainerView.hidden = YES;
+		return;
+	}
 
-    if (CGRectEqualToRect(rightBarButtonItem.frame, CGRectZero)) {
-        rightBarButtonItem.frame = self.rightBarButtonContainerView.bounds;
-    }
+	if (CGRectEqualToRect(rightBarButtonItem.frame, CGRectZero)) {
+		rightBarButtonItem.frame = self.rightBarButtonContainerView.bounds;
+	}
 
-    self.rightBarButtonContainerView.hidden = NO;
-    self.rightHorizontalSpacingConstraint.constant = kJSQMessagesToolbarContentViewHorizontalSpacingDefault;
-    self.rightBarButtonItemWidth = CGRectGetWidth(rightBarButtonItem.frame);
+	self.rightBarButtonContainerView.hidden = NO;
+	self.rightHorizontalSpacingConstraint.constant = kJSQMessagesToolbarContentViewHorizontalSpacingDefault;
+	self.rightBarButtonItemWidth = CGRectGetWidth(rightBarButtonItem.frame);
 
-    [rightBarButtonItem setTranslatesAutoresizingMaskIntoConstraints:NO];
+	[rightBarButtonItem setTranslatesAutoresizingMaskIntoConstraints:NO];
 
-    [self.rightBarButtonContainerView addSubview:rightBarButtonItem];
-    [self.rightBarButtonContainerView jsq_pinAllEdgesOfSubview:rightBarButtonItem];
-    [self setNeedsUpdateConstraints];
+	[self.rightBarButtonContainerView addSubview:rightBarButtonItem];
+	[self.rightBarButtonContainerView jsq_pinAllEdgesOfSubview:rightBarButtonItem];
+	[self setNeedsUpdateConstraints];
 
-    _rightBarButtonItem = rightBarButtonItem;
+	_rightBarButtonItem = rightBarButtonItem;
 }
 
 - (void)setRightBarButtonItemWidth:(CGFloat)rightBarButtonItemWidth
 {
-    self.rightBarButtonContainerViewWidthConstraint.constant = rightBarButtonItemWidth;
-    [self setNeedsUpdateConstraints];
+	self.rightBarButtonContainerViewWidthConstraint.constant = rightBarButtonItemWidth;
+	[self setNeedsUpdateConstraints];
 }
 
 - (void)setRightContentPadding:(CGFloat)rightContentPadding
 {
-    self.rightHorizontalSpacingConstraint.constant = rightContentPadding;
-    [self setNeedsUpdateConstraints];
+	self.rightHorizontalSpacingConstraint.constant = rightContentPadding;
+	[self setNeedsUpdateConstraints];
 }
 
 - (void)setLeftContentPadding:(CGFloat)leftContentPadding
 {
-    self.leftHorizontalSpacingConstraint.constant = leftContentPadding;
-    [self setNeedsUpdateConstraints];
+	self.leftHorizontalSpacingConstraint.constant = leftContentPadding;
+	[self setNeedsUpdateConstraints];
 }
 
 #pragma mark - Getters
 
 - (CGFloat)leftBarButtonItemWidth
 {
-    return self.leftBarButtonContainerViewWidthConstraint.constant;
+	return self.leftBarButtonContainerViewWidthConstraint.constant;
 }
 
 - (CGFloat)rightBarButtonItemWidth
 {
-    return self.rightBarButtonContainerViewWidthConstraint.constant;
+	return self.rightBarButtonContainerViewWidthConstraint.constant;
 }
 
 - (CGFloat)rightContentPadding
 {
-    return self.rightHorizontalSpacingConstraint.constant;
+	return self.rightHorizontalSpacingConstraint.constant;
 }
 
 - (CGFloat)leftContentPadding
 {
-    return self.leftHorizontalSpacingConstraint.constant;
+	return self.leftHorizontalSpacingConstraint.constant;
 }
 
 #pragma mark - UIView overrides
 
 - (void)setNeedsDisplay
 {
-    [super setNeedsDisplay];
-    [self.textView setNeedsDisplay];
+	[super setNeedsDisplay];
+	[self.textView setNeedsDisplay];
 }
 
 @end
+

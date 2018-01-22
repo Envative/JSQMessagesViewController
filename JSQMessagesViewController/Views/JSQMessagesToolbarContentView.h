@@ -111,6 +111,14 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingD
  */
 @property (weak, nonatomic, readonly) UIView *rightBarButtonContainerView;
 
+/**
+ * Determines if the content view includes additional spacing for devices with the the home indicator.
+ *
+ * @discussion
+ * The iPhone X requires additional spacing at the bottom of the screen.
+ */
+@property (assign, nonatomic) BOOL shouldAddSpaceForHomeIndicator;
+
 #pragma mark - Class methods
 
 /**
