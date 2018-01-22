@@ -22,8 +22,9 @@
 
 #import "NSString+JSQMessages.h"
 
-
 @implementation JSQMessagesComposerTextView
+
+@synthesize pasteDelegate;
 
 #pragma mark - Initialization
 
