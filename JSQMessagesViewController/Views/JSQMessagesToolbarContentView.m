@@ -21,6 +21,8 @@
 #import "UIView+JSQMessages.h"
 
 const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingDefault = 8.0f;
+const CGFloat kJSQMessagesToolbarButtonBottomInset_Default = 6.0f;
+const CGFloat kJSQMessagesToolbarTextViewBottomInset_Default = 7.0f;
 const CGFloat kJSQMessagesToolbarButtonBottomInset_iPhoneXDefault = 26.0f;
 const CGFloat kJSQMessagesToolbarTextViewBottomInset_iPhoneXDefault = 27.0f;
 
@@ -165,6 +167,22 @@ const CGFloat kJSQMessagesToolbarTextViewBottomInset_iPhoneXDefault = 27.0f;
 - (void)setLeftContentPadding:(CGFloat)leftContentPadding
 {
 	self.leftHorizontalSpacingConstraint.constant = leftContentPadding;
+	[self setNeedsUpdateConstraints];
+}
+
+- (void)setShouldAddSpaceForHomeIndicator:(BOOL)shouldAddSpaceForHomeIndicator {
+	_shouldAddSpaceForHomeIndicator = shouldAddSpaceForHomeIndicator;
+
+	if (self.shouldAddSpaceForHomeIndicator == YES) {
+		self.leftBarButtonContainerViewBottomConstraint.constant = kJSQMessagesToolbarButtonBottomInset_iPhoneXDefault;
+		self.rightBarButtonContainerViewBottomConstraint.constant = kJSQMessagesToolbarButtonBottomInset_iPhoneXDefault;
+		self.textViewBottomConstraint.constant = kJSQMessagesToolbarTextViewBottomInset_iPhoneXDefault;
+	} else {
+		self.leftBarButtonContainerViewBottomConstraint.constant = kJSQMessagesToolbarButtonBottomInset_Default;
+		self.rightBarButtonContainerViewBottomConstraint.constant = kJSQMessagesToolbarButtonBottomInset_Default;
+		self.textViewBottomConstraint.constant = 7.0;
+	}
+
 	[self setNeedsUpdateConstraints];
 }
 
